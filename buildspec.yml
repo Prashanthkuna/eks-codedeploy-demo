@@ -16,18 +16,14 @@ phases:
 
   pre_build:
     commands:
-      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
       - aws ecr get-login-password --region $AWS_REGION |
         docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
   build:
     commands:
       - docker build -t $ECR_REPO .
       - docker tag $ECR_REPO:latest $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
       - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:latest
-
-artifacts:
-  files:
-    - deployment.yaml
-    - service.yaml
-    - appspec.yml
+      - kubectl apply -f deployment.yaml
+      - kubectl apply -f service.yaml
