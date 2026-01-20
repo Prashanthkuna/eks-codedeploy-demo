@@ -15,10 +15,12 @@ phases:
       - mv kubectl /usr/local/bin/
 
   pre_build:
-    commands:
-      - aws ecr get-login-password --region $AWS_REGION |
-        docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
-      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+  commands:
+    - echo Logging in to Amazon ECR...
+    - aws ecr get-login-password --region $AWS_REGION |
+      docker login --username AWS --password-stdin \
+      $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
 
   build:
     commands:
